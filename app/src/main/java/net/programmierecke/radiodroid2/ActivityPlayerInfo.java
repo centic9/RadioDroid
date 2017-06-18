@@ -38,6 +38,7 @@ public class ActivityPlayerInfo extends AppCompatActivity {
 	private Thread t;
 	private LinearLayout layoutPlaying;
 	private TextView textViewStatus;
+	private ImageButton buttonClose;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +101,7 @@ public class ActivityPlayerInfo extends AppCompatActivity {
 		textViewTransferredbytes = (TextView) findViewById(R.id.textViewTransferredBytes);
 		layoutPlaying = (LinearLayout) findViewById(R.id.LinearLayoutPlaying);
 		textViewStatus = (TextView) findViewById(R.id.detail_status);
+		buttonClose = (ImageButton) findViewById(R.id.buttonClose);
 
 		buttonPause = (ImageButton) findViewById(R.id.buttonPause);
 		if (buttonPause != null){
@@ -296,14 +298,25 @@ public class ActivityPlayerInfo extends AppCompatActivity {
 			if(BuildConfig.DEBUG) { Log.d("ARR","exit.."); }
 			textViewStatus.setText(getResources().getString(R.string.player_info_status)+getResources().getString(R.string.player_info_status_stopped));
 			layoutPlaying.setVisibility(View.VISIBLE);
-		} else {
-				if (PlayerServiceUtil.isPlaying() && !PlayerServiceUtil.isRecording()) {
-					textViewStatus.setText(getResources().getString(R.string.player_info_status)+getResources().getString(R.string.player_info_status_playing));
-					layoutPlaying.setVisibility(View.VISIBLE);
-				} else {
-					textViewStatus.setText(getResources().getString(R.string.player_info_status)+getResources().getString(R.string.player_info_status_playing_and_recording));
-					layoutPlaying.setVisibility(View.VISIBLE);
-				}
+            buttonClose = (ImageButton) findViewById(R.id.buttonClose);
+            if (buttonClose != null){
+                buttonClose.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        finish();
+                    }
+                });
+            }
+		}else{
+        } else {
+            if (PlayerServiceUtil.isPlaying() && !PlayerServiceUtil.isRecording()) {
+                textViewStatus.setText(getResources().getString(R.string.player_info_status)+getResources().getString(R.string.player_info_status_playing));
+                layoutPlaying.setVisibility(View.VISIBLE);
+            } else {
+                textViewStatus.setText(getResources().getString(R.string.player_info_status)+getResources().getString(R.string.player_info_status_playing_and_recording));
+                layoutPlaying.setVisibility(View.VISIBLE);
+            }
+            buttonClose.setVisibility(View.GONE);
 		}
 	}
 
