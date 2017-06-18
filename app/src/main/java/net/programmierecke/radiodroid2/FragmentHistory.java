@@ -29,8 +29,10 @@ public class FragmentHistory extends Fragment {
     protected void RefreshListGui() {
         if (BuildConfig.DEBUG) Log.d(TAG, "refreshing the stations list.");
 
-        HistoryManager historyManager = new HistoryManager(getActivity());
-        ItemAdapterStation adapter = (ItemAdapterStation) rvStations.getAdapter();
+
+            HistoryManager historyManager = new HistoryManager(getActivity());
+            ItemAdapterStation adapter = (ItemAdapterStation) rvStations.getAdapter();
+
 
         if (BuildConfig.DEBUG) Log.d(TAG, "stations count:" + historyManager.listStations.size());
 

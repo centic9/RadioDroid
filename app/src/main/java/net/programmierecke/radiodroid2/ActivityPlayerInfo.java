@@ -307,7 +307,6 @@ public class ActivityPlayerInfo extends AppCompatActivity {
                     }
                 });
             }
-		}else{
         } else {
             if (PlayerServiceUtil.isPlaying() && !PlayerServiceUtil.isRecording()) {
                 textViewStatus.setText(getResources().getString(R.string.player_info_status)+getResources().getString(R.string.player_info_status_playing));

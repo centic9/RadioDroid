@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -21,7 +22,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
-
 import net.programmierecke.radiodroid2.interfaces.IFragmentRefreshable;
 import net.programmierecke.radiodroid2.interfaces.IFragmentSearchable;
 
@@ -75,21 +75,17 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
             selectedMenuItem = savedInstanceState.getInt(SAVE_LAST_MENU_ITEM, -1);
         }
 
-        try {
-            File dir = new File(getFilesDir().getAbsolutePath());
-            if (dir.isDirectory()) {
-                String[] children = dir.list();
-                for (String aChildren : children) {
-                    if (BuildConfig.DEBUG) {
-                        Log.d("MAIN", "delete file:" + aChildren);
-                    }
-                    try {
-                        new File(dir, aChildren).delete();
-                    } catch (Exception e) {
-                    }
+        File dir = new File(getFilesDir().getAbsolutePath());
+        if (dir.isDirectory()) {
+            String[] children = dir.list();
+            for (String aChildren : children) {
+                if (BuildConfig.DEBUG) {
+                    Log.d("MAIN", "delete file:" + aChildren);
+                }
+                if (!new File(dir, aChildren).delete()) {
+                    Log.w("MAIN", "Failed to delete " + new File(dir, aChildren));
                 }
             }
-        } catch (Exception e) {
         }
 
         final Toolbar myToolbar = (Toolbar) findViewById(R.id.my_awesome_toolbar);
@@ -109,7 +105,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
 
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public boolean onNavigationItemSelected(MenuItem menuItem) {
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 mDrawerLayout.closeDrawers();
                 android.support.v4.app.Fragment f = null;
 
@@ -196,7 +192,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         MPDClient.StartDiscovery(this, this);
     }
 
-    @Override
+	@Override
     protected void onNewIntent(Intent intent) {
         final Bundle extras = intent.getExtras();
         if (extras == null) {
@@ -216,29 +212,25 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "on request permissions result:" + requestCode);
-        }
-        switch (requestCode) {
-            case Utils.REQUEST_EXTERNAL_STORAGE: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if (fragRefreshable != null) {
-                        if (BuildConfig.DEBUG) {
-                            Log.d(TAG, "REFRESH VIEW");
-                        }
-                        fragRefreshable.Refresh();
-                    }
-                } else {
-                    Toast toast = Toast.makeText(this, getResources().getString(R.string.error_record_needs_write), Toast.LENGTH_SHORT);
-                    toast.show();
-                }
-                return;
-            }
-        }
-    }
+	public void onRequestPermissionsResult(int requestCode,
+										  @NonNull String permissions[], @NonNullint[] grantResults) {
+		if(BuildConfig.DEBUG) { Log.d(TAG,"on request permissions result:"+requestCode);
+		}switch (requestCode) {
+			case Utils.REQUEST_EXTERNAL_STORAGE: {
+				// If request is cancelled, the result arrays are empty.
+				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					if (fragRefreshable != null){
+						if(BuildConfig.DEBUG) { Log.d(TAG,"REFRESH VIEW"); }
+						fragRefreshable.Refresh();
+					}
+				} else {
+					Toast toast = Toast.makeText(this, getResources().getString(R.string.error_record_needs_write), Toast.LENGTH_SHORT);
+					toast.show();
+				}
+
+			}
+		}
+	}
 
     @Override
     public void onDestroy() {
