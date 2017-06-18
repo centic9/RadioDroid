@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import net.programmierecke.radiodroid2.interfaces.IAdapterRefreshable;
 import net.programmierecke.radiodroid2.interfaces.IFragmentRefreshable;
 import net.programmierecke.radiodroid2.interfaces.IFragmentSearchable;
 
@@ -27,21 +28,23 @@ public class FragmentTabs extends Fragment implements IFragmentRefreshable, IFra
     private String itsAdressWWWCountries = "https://www.radio-browser.info/webservice/json/countries";
     private String itsAdressWWWLanguages = "https://www.radio-browser.info/webservice/json/languages";
 
-    private ViewPager viewPager;
+    // Note: the order of tabs needs to be set here as well as
+    // further down when populating the ViewPagerAdapter
+    private static final int IDX_STARRED = 0;
+    private static final int IDX_TOP_CLICK = 1;
+    private static final int IDX_TOP_VOTE = 2;
+    private static final int IDX_CHANGED_LATELY = 3;
+    private static final int IDX_CURRENTLY_HEARD = 4;
+    private static final int IDX_TAGS = 5;
+    private static final int IDX_COUNTRIES = 6;
+    private static final int IDX_LANGUAGES = 7;
+    private static final int IDX_SEARCH = 8;
+
+    public static ViewPager viewPager;
 
     private String searchQuery; // Search may be requested before onCreateView so we should wait
 
-    FragmentBase[] fragments = new FragmentBase[8];
-    String[] adresses = new String[]{
-            itsAdressWWWTopClick,
-            itsAdressWWWTopVote,
-            itsAdressWWWChangedLately,
-            itsAdressWWWCurrentlyHeard,
-            itsAdressWWWTags,
-            itsAdressWWWCountries,
-            itsAdressWWWLanguages,
-            ""
-    };
+    Fragment[] fragments = new Fragment[9];
 
     @Nullable
     @Override
@@ -74,40 +77,57 @@ public class FragmentTabs extends Fragment implements IFragmentRefreshable, IFra
     }
 
     private void setupViewPager(ViewPager viewPager) {
-        for (int i = 0; i < fragments.length; i++) {
-            if (i < 4)
-                fragments[i] = new FragmentStations();
-            else if (i < 7)
-                fragments[i] = new FragmentCategories();
-            else
-                fragments[i] = new FragmentStations();
+        fragments[IDX_STARRED] = new FragmentStarred();
+        fragments[IDX_TOP_CLICK] = new FragmentStations();
+        fragments[IDX_TOP_VOTE] = new FragmentStations();
+        fragments[IDX_CHANGED_LATELY] = new FragmentStations();
+        fragments[IDX_CURRENTLY_HEARD] = new FragmentStations();
+        fragments[IDX_TAGS] = new FragmentCategories();
+        fragments[IDX_COUNTRIES] = new FragmentCategories();
+        fragments[IDX_LANGUAGES] = new FragmentCategories();
+        fragments[IDX_SEARCH] = new FragmentStations();
+
+        String[] addresses = new String[]{
+                "",
+                itsAdressWWWTopClick,
+                itsAdressWWWTopVote,
+                itsAdressWWWChangedLately,
+                itsAdressWWWCurrentlyHeard,
+                itsAdressWWWTags,
+                itsAdressWWWCountries,
+                itsAdressWWWLanguages,
+                ""
+        };
+
+        for (int i=0;i<fragments.length;i++) {
             Bundle bundle1 = new Bundle();
-            bundle1.putString("url", adresses[i]);
+            bundle1.putString("url", addresses[i]);
             fragments[i].setArguments(bundle1);
         }
 
-        ((FragmentCategories) fragments[4]).EnableSingleUseFilter(true);
-        ((FragmentCategories) fragments[4]).SetBaseSearchLink("https://www.radio-browser.info/webservice/json/stations/bytagexact");
-        ((FragmentCategories) fragments[5]).SetBaseSearchLink("https://www.radio-browser.info/webservice/json/stations/bycountryexact");
-        ((FragmentCategories) fragments[6]).SetBaseSearchLink("https://www.radio-browser.info/webservice/json/stations/bylanguageexact");
+        ((FragmentCategories)fragments[IDX_TAGS]).EnableSingleUseFilter(true);
+        ((FragmentCategories)fragments[IDX_TAGS]).SetBaseSearchLink("https://www.radio-browser.info/webservice/json/stations/bytagexact");
+        ((FragmentCategories)fragments[IDX_COUNTRIES]).SetBaseSearchLink("https://www.radio-browser.info/webservice/json/stations/bycountryexact");
+        ((FragmentCategories)fragments[IDX_LANGUAGES]).SetBaseSearchLink("https://www.radio-browser.info/webservice/json/stations/bylanguageexact");
 
         FragmentManager m = getChildFragmentManager();
         ViewPagerAdapter adapter = new ViewPagerAdapter(m);
-        adapter.addFragment(fragments[0], R.string.action_top_click);
-        adapter.addFragment(fragments[1], R.string.action_top_vote);
-        adapter.addFragment(fragments[2], R.string.action_changed_lately);
-        adapter.addFragment(fragments[3], R.string.action_currently_playing);
-        adapter.addFragment(fragments[4], R.string.action_tags);
-        adapter.addFragment(fragments[5], R.string.action_countries);
-        adapter.addFragment(fragments[6], R.string.action_languages);
-        adapter.addFragment(fragments[7], R.string.action_search);
+        adapter.addFragment(fragments[IDX_STARRED], R.string.nav_item_starred);
+        adapter.addFragment(fragments[IDX_TOP_CLICK], R.string.action_top_click);
+        adapter.addFragment(fragments[IDX_TOP_VOTE], R.string.action_top_vote);
+        adapter.addFragment(fragments[IDX_CHANGED_LATELY], R.string.action_changed_lately);
+        adapter.addFragment(fragments[IDX_CURRENTLY_HEARD], R.string.action_currently_playing);
+        adapter.addFragment(fragments[IDX_TAGS], R.string.action_tags);
+        adapter.addFragment(fragments[IDX_COUNTRIES], R.string.action_countries);
+        adapter.addFragment(fragments[IDX_LANGUAGES], R.string.action_languages);
+        adapter.addFragment(fragments[IDX_SEARCH], R.string.action_search);
         viewPager.setAdapter(adapter);
     }
 
-    public void Search(final String query) {
+    public void Search(String query) {
         if (viewPager != null) {
-            viewPager.setCurrentItem(7, false);
-            fragments[7].SetDownloadUrl(query);
+            viewPager.setCurrentItem(IDX_SEARCH);
+            ((FragmentBase)fragments[IDX_SEARCH]).SetDownloadUrl(query);
         } else {
             searchQuery = query;
         }
@@ -115,8 +135,12 @@ public class FragmentTabs extends Fragment implements IFragmentRefreshable, IFra
 
     @Override
     public void Refresh() {
-        FragmentBase fragment = fragments[viewPager.getCurrentItem()];
-        fragment.DownloadUrl(true);
+        Fragment fragment = fragments[viewPager.getCurrentItem()];
+        if(fragment instanceof FragmentBase) {
+            ((FragmentBase) fragment).DownloadUrl(true);
+        } else if (fragment instanceof IAdapterRefreshable) {
+            ((FragmentStarred)fragment).RefreshListGui();
+        }
     }
 
     class ViewPagerAdapter extends FragmentPagerAdapter {
