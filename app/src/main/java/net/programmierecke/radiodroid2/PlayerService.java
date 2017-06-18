@@ -531,33 +531,35 @@ public class PlayerService extends Service implements RadioPlayer.PlayerListener
     void acquireWakeLockAndWifiLock() {
         if (BuildConfig.DEBUG) Log.d(TAG, "acquiring wake lock and wifi lock.");
 
-        if (wakeLock == null) {
-            wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "PlayerService");
-        }
-        if (!wakeLock.isHeld()) {
-            wakeLock.acquire();
+		if (wakeLock == null) {
+			wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "PlayerService");
+		}
+		if (!wakeLock.isHeld()) {
+			wakeLock.acquire();
         } else {
-            if (BuildConfig.DEBUG) Log.d(TAG, "wake lock is already acquired.");
-        }
+            if (BuildConfig.DEBUG)Log.d(TAG,"wake lock is already acquired.");
+			}
 
-        WifiManager wm = (WifiManager) itsContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        if (wm != null) {
-            if (wifiLock == null) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
-                    wifiLock = wm.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "PlayerService");
-                } else {
-                    wifiLock = wm.createWifiLock(WifiManager.WIFI_MODE_FULL, "PlayerService");
-                }
-            }
-            if (!wifiLock.isHeld()) {
-                wifiLock.acquire();
-            } else {
+		WifiManager wm = (WifiManager) itsContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+		if (wm != null) {
+
+			if (wifiLock == null) {
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
+					wifiLock = wm.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "PlayerService");
+				} else {
+					wifiLock = wm.createWifiLock(WifiManager.WIFI_MODE_FULL, "PlayerService");
+				}
+			}
+			if (!wifiLock.isHeld()) {
+
+				wifiLock.acquire();
+			}else {
                 if (BuildConfig.DEBUG) Log.d(TAG, "wifi lock is already acquired.");
             }
-        } else {
-            Log.e(TAG, "could not acquire wifi lock, WifiManager does not exist!");
+		}else{
+			Log.e(TAG,"could not acquire wifi lock, WifiManager does not exist!");
         }
-    }
+		}
 
     private void releaseWakeLockAndWifiLock() {
         if (BuildConfig.DEBUG) Log.d(TAG, "releasing wake lock and wifi lock.");

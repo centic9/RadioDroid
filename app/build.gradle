@@ -11,19 +11,19 @@ android {
     }
 
     defaultConfig {
-        applicationId "net.programmierecke.radiodroid2"
+        applicationId "net.programmierecke.radiodroid2.dost"
         minSdkVersion 15
         targetSdkVersion 23
 
         versionCode 50
-        versionName "0.40"
+        versionName "0.40.1"
 
         vectorDrawables.useSupportLibrary = true
 
         // Define your application name here.
         // It must neither be present in /res/values/strings.xml
         // nor in /res/values/string_no_translate.xml
-        resValue 'string', 'app_name', 'RadioDroid'
+        resValue 'string', 'app_name', 'RadioDost'
     }
 
     sourceSets {
