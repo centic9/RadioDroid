@@ -103,11 +103,11 @@ public class StreamProxy {
                     bytesUntilMetaData -= readBytes;
                 }
 
-                if (BuildConfig.DEBUG) Log.d(TAG, "stream bytes relayed:" + readBytes);
+                //if (BuildConfig.DEBUG) Log.d(TAG, "stream bytes relayed:" + readBytes);
 
                 outStream.write(buf, 0, readBytesBuffer);
                 if (fileOutputStream != null) {
-                    if (BuildConfig.DEBUG) Log.d(TAG, "writing to record file..");
+                    //if (BuildConfig.DEBUG) Log.d(TAG, "writing to record file..");
                     fileOutputStream.write(buf, 0, readBytesBuffer);
                 }
                 readBytesBuffer = 0;
