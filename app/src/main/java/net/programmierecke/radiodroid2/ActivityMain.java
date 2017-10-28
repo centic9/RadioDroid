@@ -213,7 +213,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
 
     @Override
 	public void onRequestPermissionsResult(int requestCode,
-										  @NonNull String permissions[], @NonNullint[] grantResults) {
+										  @NonNull String permissions[], @NonNull int[] grantResults) {
 		if(BuildConfig.DEBUG) { Log.d(TAG,"on request permissions result:"+requestCode);
 		}switch (requestCode) {
 			case Utils.REQUEST_EXTERNAL_STORAGE: {
